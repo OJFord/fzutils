@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+print_usage() {
+    echo 'git-fzsha: fuzzy-finder (fzf) for git SHAs'
+    echo
+    echo 'Usage: git fzsha [-h|--help|help]'
+    echo
+    echo 'Options:'
+    echo '  -h,--help,help  Display this help.'
+}
+
+fzsha() {
+    preview_cmd='echo {} | cut --delimiter=" " --field=1 | xargs git show'
+    git log --pretty=oneline --abbrev-commit --all \
+        | fzf --no-multi --preview="$preview_cmd" \
+        | cut --delimiter=' ' --field=1
+}
+
+case "$1" in
+    -h|--help|help)
+        print_usage
+        exit 0
+        ;;
+    '')
+        fzsha
+        ;;
+    *)
+        >&2 print_usage
+        exit 1
+        ;;
+esac

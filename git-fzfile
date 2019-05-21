@@ -1,0 +1,72 @@
+#!/bin/sh
+set -e
+
+print_usage() {
+    echo 'git-fzfile: fuzzy-finder (fzf) for file arguments to git commands'
+    echo
+    echo 'Called with any arguments to another git <cmd> (given as first'
+    echo 'argument) that expects at least one <path>s, it provides all those'
+    echo 'arguments plus the output of fzf if no <path>s were specified.'
+    echo
+    echo 'If a <commit> or something else of the form that *could* be a <path>,'
+    echo 'fzf will only be invoked if -- is given and no <path> follows.'
+    echo
+    echo 'Usage: git fzfile (<cmd> [CMD_OPTS...]|-h|--help)'
+    echo
+    echo '*NOTE*: If -h, --help, or help is in CMD_OPTS, we kindly assume'
+    echo 'we'\''ve been called from an alias and drop straight into <cmd>'\''s'
+    echo 'help, rather than requiring a fuzzy-found file first!'
+}
+
+case "$1" in
+    -h|--help)
+        print_usage
+        exit 0
+        ;;
+    '')
+        >&2 print_usage
+        exit 1
+        ;;
+    *)
+        cmd="$1"
+        shift
+        ;;
+esac
+
+indexed_file_expected=no
+pathspec_given=no
+
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            git "$cmd" "$@"
+            exit 0
+            ;;
+        --)
+            pathspec_given=yes
+            ;;
+        -p|--patch)
+            indexed_file_expected=yes
+            ;;
+        -*)
+            ;;
+        *)
+            pathspec_given=yes
+            ;;
+    esac
+done
+
+if [ "$pathspec_given" = yes ]; then
+    echo "$@"
+    exit 0
+fi
+
+fzfiles() {
+    if [ "$indexed_file_expected" = yes ]; then
+        git ls-files | fzf "$@"
+    else
+        fzf "$@"
+    fi
+}
+
+sh -c "git $cmd $* -- $(fzfiles --multi | tr '\n' ' ')"

@@ -4,17 +4,15 @@ set -e
 print_usage() {
     echo 'git-fzsha: fuzzy-finder (fzf) for git SHAs'
     echo
-    echo 'Usage: git fzsha [-h|--help|help]'
+    echo 'Called with any arguments to another git <cmd> (given as first'
+    echo 'argument) that expects at least one <commit>s, it provides all those'
+    echo 'arguments plus the output of fzf if no <commit> was specified.'
     echo
-    echo 'Options:'
-    echo '  -h,--help,help  Display this help.'
-}
-
-fzsha() {
-    preview_cmd='echo {} | cut --delimiter=" " --field=1 | xargs git show'
-    git log --pretty=oneline --abbrev-commit --all \
-        | fzf --no-multi --preview="$preview_cmd" \
-        | cut --delimiter=' ' --field=1
+    echo 'Usage: git fzsha (<cmd> [CMD_OPTS...]|-h|--help)'
+    echo
+    echo '*NOTE*: If -h, --help, or help is in CMD_OPTS, we kindly assume'
+    echo 'we'\''ve been called from an alias and drop straight into <cmd>'\''s'
+    echo 'help, rather than requiring a fuzzy-found SHA first!'
 }
 
 case "$1" in
@@ -23,10 +21,39 @@ case "$1" in
         exit 0
         ;;
     '')
-        fzsha
-        ;;
-    *)
         >&2 print_usage
         exit 1
         ;;
+    *)
+        cmd="$1"
+        shift
+        ;;
 esac
+
+commit_given=no
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            git "$cmd" "$@"
+            exit 0
+            ;;
+        -*)
+            ;;
+        *)
+            commit_given=yes
+            ;;
+    esac
+done
+
+fzsha() {
+    preview_cmd='echo {} | cut --delimiter=" " --field=1 | xargs git show'
+    git log --pretty=oneline --abbrev-commit --all \
+        | fzf --no-multi --preview="$preview_cmd" \
+        | cut --delimiter=' ' --field=1
+}
+
+if [ "$commit_given" != yes ]; then
+    sha="$(fzsha)"
+fi
+
+sh -c "git $cmd $* $sha"

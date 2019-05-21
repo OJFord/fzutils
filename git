@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+# It seems plumbing commands may not be overridden in git config.
+# They may not even be overridden via git-<cmd> executables higher on PATH.
+# (Tried and failed in git version 2.21.0).
+#
+# Thus, the goal here is to search for the given git <cmd> in my git/bin first,
+# so that I can override plumbing commands too.
+
+real_git="$(type -a -p git | grep --invert-match "$0" | head -n1)"
+
+if [ -z "$1" ]; then
+    "$real_git"
+    exit 0
+fi
+
+override="$XDG_CONFIG_HOME/git/bin/git-$1"
+if [ -x "$override" ]; then
+    shift
+    PATH="$(dirname "$real_git"):$PATH" "$override" "$@"
+else
+    "$real_git" "$@"
+fi

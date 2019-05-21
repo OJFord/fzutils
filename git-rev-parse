@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+# git-rev-parse alias to fuzzy find SHA if not specified.
+# not in git config alias due to being a plumbing command, see note in ./git
+git fzsha rev-parse "$@"

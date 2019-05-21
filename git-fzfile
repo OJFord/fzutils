@@ -33,6 +33,12 @@ case "$1" in
         ;;
 esac
 
+# interactive only
+if ! [ -t 0 ]; then
+    git "$cmd" "$@"
+    exit 0
+fi
+
 indexed_file_expected=no
 pathspec_given=no
 

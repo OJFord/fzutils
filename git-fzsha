@@ -30,6 +30,12 @@ case "$1" in
         ;;
 esac
 
+# interactive only
+if ! [ -t 0 ]; then
+    git "$cmd" "$@"
+    exit 0
+fi
+
 commit_given=no
 for arg in "$@"; do
     case "$arg" in

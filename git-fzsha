@@ -52,9 +52,8 @@ for arg in "$@"; do
 done
 
 fzsha() {
-    preview_cmd='echo {} | cut --delimiter=" " --field=1 | xargs git show --color=always'
     git log --color=always --pretty=oneline --abbrev-commit --all \
-        | fzf --ansi --no-multi --preview="$preview_cmd" \
+        | fzf --ansi --delimiter=' ' --no-multi --preview='git show --color=always {1}' \
         | cut --delimiter=' ' --field=1
 }
 

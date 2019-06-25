@@ -52,8 +52,8 @@ for arg in "$@"; do
 done
 
 fzsha() {
-    git log --color=always --pretty=oneline --abbrev-commit --all \
-        | fzf --ansi --delimiter=' ' --no-multi --preview='git show --color=always {1}' \
+    git log --pretty=oneline --all \
+        | fzf --ansi --delimiter=' ' --no-multi --preview='git show --color=always {1}' --with-nth='2..' \
         | cut --delimiter=' ' --field=1
 }
 

@@ -21,18 +21,17 @@ case "$1" in
         exit 0
         ;;
     '')
-        >&2 print_usage
-        exit 1
+        cmd="git show --quiet"
         ;;
     *)
-        cmd="$1"
+        cmd="git $1"
         shift
         ;;
 esac
 
 # interactive only
 if ! [ -t 0 ]; then
-    git "$cmd" "$@"
+    eval "$cmd $@"
     exit 0
 fi
 
@@ -40,7 +39,7 @@ commit_given=no
 for arg in "$@"; do
     case "$arg" in
         -h|--help)
-            git "$cmd" "$@"
+            eval "$cmd $@"
             exit 0
             ;;
         -*)
@@ -61,4 +60,4 @@ if [ "$commit_given" != yes ]; then
     sha="$(fzsha)"
 fi
 
-sh -c "git $cmd $* $sha"
+eval "$cmd $@ $sha"

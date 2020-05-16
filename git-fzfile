@@ -24,8 +24,7 @@ case "$1" in
         exit 0
         ;;
     '')
-        >&2 print_usage
-        exit 1
+        cmd="ls-files"
         ;;
     *)
         cmd="$1"

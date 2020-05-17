@@ -15,10 +15,10 @@ if [ -z "$1" ]; then
     exit 0
 fi
 
-override="$XDG_CONFIG_HOME/git/bin/git-$1"
-if [ -x "$override" ]; then
+override="git-$1"
+if type "$override" >/dev/null 2>&1; then
     shift
-    PATH="$(dirname "$real_git"):$PATH" "$override" "$@"
+    PATH="$(dirname "$real_git"):$PATH" "$(type -p "$override")" "$@"
 else
     "$real_git" "$@"
 fi

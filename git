@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # It seems plumbing commands may not be overridden in git config.

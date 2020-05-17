@@ -1,0 +1,5 @@
+repos:
+  - repo: https://github.com/ArturKlauser/shellcheck
+    rev: 5f66176
+    hooks:
+      - id: shellcheck

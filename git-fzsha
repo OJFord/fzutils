@@ -39,7 +39,7 @@ commit_given=no
 for arg in "$@"; do
     case "$arg" in
         -h|--help)
-            eval "$cmd $@"
+            eval "$cmd" "$@"
             exit $?
             ;;
         -*)
@@ -60,5 +60,5 @@ if [ "$commit_given" != yes ]; then
     sha="$(fzsha)"
 fi
 
-eval "$cmd $@ $sha"
+eval "$cmd" "$@" "$sha"
 exit $?

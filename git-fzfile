@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # interactive only
@@ -74,5 +74,6 @@ fzfiles() {
     fi
 }
 
-git "$cmd" "$@" -- $(fzfiles --multi | tr '\n' ' ')
+mapfile -t files < <(fzfiles --multi)
+git "$cmd" "$@" -- "${files[@]}"
 exit $?

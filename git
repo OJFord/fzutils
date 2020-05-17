@@ -11,14 +11,13 @@ set -e
 real_git="$(type -a -p git | grep --invert-match "$0" | head -n1)"
 
 if [ -z "$1" ]; then
-    "$real_git"
-    exit 0
+    exec "$real_git"
 fi
 
 override="git-$1"
 if type "$override" >/dev/null 2>&1; then
     shift
-    PATH="$(dirname "$real_git"):$PATH" "$(type -p "$override")" "$@"
+    PATH="$(dirname "$real_git"):$PATH" exec "$(type -p "$override")" "$@"
 else
-    "$real_git" "$@"
+    exec "$real_git" "$@"
 fi

@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# interactive only
+if ! [ -t 0 ]; then
+    shift
+    exec git "$@"
+fi
+
 print_usage() {
     echo 'git-fzfile: fuzzy-finder (fzf) for file arguments to git commands'
     echo
@@ -32,12 +38,6 @@ case "$1" in
         ;;
 esac
 
-# interactive only
-if ! [ -t 0 ]; then
-    git "$cmd" "$@"
-    exit 0
-fi
-
 indexed_file_expected=no
 pathspec_given=no
 
@@ -45,7 +45,7 @@ for arg in "$@"; do
     case "$arg" in
         -h|--help)
             git "$cmd" "$@"
-            exit 0
+            exit $?
             ;;
         --)
             pathspec_given=yes
@@ -74,4 +74,5 @@ fzfiles() {
     fi
 }
 
-sh -c "git $cmd $* -- $(fzfiles --multi | tr '\n' ' ')"
+git "$cmd" "$@" -- $(fzfiles --multi | tr '\n' ' ')
+exit $?

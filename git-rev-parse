@@ -7,7 +7,7 @@ set -e
 # Most rev-parse flags don't require (or accept) a commit, so for simplicity's
 # sake let's only run fzsha if we have no args.
 if [ $# -eq 0 ]; then
-    git fzsha rev-parse "$@"
+    git fzsha rev-parse
 else
     git rev-parse "$@"
 fi

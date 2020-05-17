@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# interactive only
+if ! [ -t 0 ]; then
+    shift
+    exec git "$@"
+fi
+
 print_usage() {
     echo 'git-fzsha: fuzzy-finder (fzf) for git SHAs'
     echo
@@ -29,18 +35,12 @@ case "$1" in
         ;;
 esac
 
-# interactive only
-if ! [ -t 0 ]; then
-    eval "$cmd $@"
-    exit 0
-fi
-
 commit_given=no
 for arg in "$@"; do
     case "$arg" in
         -h|--help)
             eval "$cmd $@"
-            exit 0
+            exit $?
             ;;
         -*)
             ;;
@@ -61,3 +61,4 @@ if [ "$commit_given" != yes ]; then
 fi
 
 eval "$cmd $@ $sha"
+exit $?

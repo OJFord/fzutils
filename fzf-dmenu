@@ -3,5 +3,23 @@ set -e
 
 FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --no-preview $*"
 
+alacritty_conf="$(mktemp)"
+cat >"$alacritty_conf" <<-EOC
+	window:
+	  class:
+	    general: fzf-dmenu
+	    instance: fzf-dmenu
+
+	  decorations: full
+
+	  dimensions:
+	    columns: 80
+	    lines: 8
+
+	  title: fzf-dmenu
+
+	background_opacity: 0.3
+EOC
+
 exec 3<&0
-alacritty --title='fzf-dmenu' --dimensions 80 8 --class=',fzf-dmenu' -e /bin/sh -c "fzf $* <&3 1>&4" 4>&1
+alacritty --config-file="$alacritty_conf" -e /bin/sh -c "fzf $* <&3 1>&4" 4>&1

@@ -3,22 +3,13 @@ set -e
 
 FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --no-preview $*"
 
-user_alacritty_conf="${XDG_CONFIG_HOME:-$HOME/.config}/alacritty/alacritty.yml"
-alacritty_conf="$(mktemp)"
-yq '. * {
-    "window": {
-        "class": {
-            "general": "fzf-dmenu",
-            "instance": "fzf-dmenu"
-        },
-        "decorations": "full",
-        "dimensions": {
-            "columns": 80,
-            "lines": 8
-        },
-        "title": "fzf-dmenu"
-    }
-}' "$user_alacritty_conf" > "$alacritty_conf"
-
 exec 3<&0
-alacritty --config-file="$alacritty_conf" -e /bin/sh -c "fzf $* <&3 1>&4" 4>&1
+alacritty \
+    -o window.class.general=fzf-dmenu \
+    -o window.class.instance=fzf-dmenu \
+    -o window.decorations=full \
+    -o window.dimensions.columns=80 \
+    -o window.dimensions.lines=8 \
+    -o window.title=fzf-dmenu \
+    -e /bin/sh -c "fzf $* <&3 1>&4" \
+    4>&1

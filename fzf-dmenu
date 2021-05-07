@@ -3,6 +3,19 @@ set -eEu
 set -o pipefail
 
 FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:-} --no-preview"
+alacritty_opts=()
+fzf_args=()
+
+for arg in "$@"; do
+    case "$arg" in
+        --fzf-*)
+            fzf_args+=("--${arg#--fzf-}")
+            ;;
+        --tty-*)
+            alacritty_opts+=('-o' "${arg#--tty-}")
+            ;;
+    esac
+done
 
 exec 3<&0
 alacritty \
@@ -12,5 +25,6 @@ alacritty \
     -o window.dimensions.columns=80 \
     -o window.dimensions.lines=8 \
     -o window.title=fzf-dmenu \
-    -e /bin/sh -c "fzf $* <&3 1>&4" \
+    "${alacritty_opts[@]}" \
+    -e /bin/sh -c "fzf ${fzf_args[*]} <&3 1>&4" \
     4>&1
